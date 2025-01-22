@@ -1,44 +1,18 @@
 #!/usr/bin/env node
 
-const nodeCrypto = require("crypto");
+const lib = require("../lib");
 const fs = require("fs");
 const path = require("path");
 
 const PROJECT_PATH = process.cwd();
-
-function encrypt(text, password) {
-  const iv = nodeCrypto.randomBytes(16); // generate a random iv
-  const cipher = nodeCrypto.createCipheriv(
-    "aes-256-cbc",
-    Buffer.from(password, "hex"),
-    iv
-  );
-  let encrypted = cipher.update(text);
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
-  return iv.toString("hex") + ":" + encrypted.toString("hex");
-}
-
-function decrypt(text, password) {
-  const textParts = text.split(":");
-  const iv = Buffer.from(textParts.shift(), "hex");
-  const encryptedText = Buffer.from(textParts.join(":"), "hex");
-  const decipher = nodeCrypto.createDecipheriv(
-    "aes-256-cbc",
-    Buffer.from(password, "hex"),
-    iv
-  );
-  let decrypted = decipher.update(encryptedText);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  return decrypted.toString();
-}
 
 function processJson(json, password, isEncrypt) {
   return Object.entries(json).reduce((acc, [key, value]) => {
     if (typeof value === "string") {
       try {
         acc[key] = isEncrypt
-          ? encrypt(value, password)
-          : decrypt(value, password);
+          ? lib.encrypt(value, password)
+          : lib.decrypt(value, password);
       } catch {
         acc[key] = value;
       }
@@ -129,11 +103,11 @@ async function main(args) {
       entry = entry[keyPathPart];
     }
 
-    entry[keyPathParts.at(-1)] = encrypt(value, password);
+    entry[keyPathParts.at(-1)] = lib.encrypt(value, password);
     await fs.promises.writeFile(outputPath, JSON.stringify(json, null, 2));
 
     console.log(
-      `[DATABAG] "${keyPath}" updated to "${decrypt(
+      `[DATABAG] "${keyPath}" updated to "${lib.decrypt(
         entry[keyPathParts.at(-1)],
         password
       )}"`
@@ -147,7 +121,7 @@ async function main(args) {
       }
     }
 
-    console.log(decrypt(entry, password));
+    console.log(lib.decrypt(entry, password));
   }
 }
 

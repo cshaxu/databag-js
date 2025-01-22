@@ -7,7 +7,8 @@
     "databag": "./bin/index.js"
   },
   "scripts": {
-    "build": "rm -rf ./lib && tsc -p tsconfig.json && crlf --set=LF bin/*"
+    "build": "rm -rf ./lib && tsc -p tsconfig.json && crlf --set=LF bin/*",
+    "test": "rm -rf test/decrypted.json && node bin/index.js --file=test/encrypted.json --password=a401ea96c6a4ce8f8a8b0c0c199af7b34cdf5469b2c7b3b1dae51c997650a0cb --decrypt --output=test/decrypted.json && diff test/data.json test/decrypted.json --ignore-space-change && echo Test passed! If it fails, you will see the diff instead."
   },
   "repository": {
     "type": "git",

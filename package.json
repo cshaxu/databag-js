@@ -31,8 +31,8 @@
     "lib"
   ],
   "devDependencies": {
-    "@types/node": "^20.12.12",
+    "@types/node": "^25.5.0",
     "crlf": "^1.1.1",
-    "typescript": "^5.4.5"
+    "typescript": "^5.9.3"
   }
 }
